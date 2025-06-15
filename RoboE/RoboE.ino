@@ -3,6 +3,7 @@
 #include "driver/dac.h"
 #include "driver/i2s.h"
 #include <math.h>
+#include <FastLED.h>     
 
 #define SCREEN_WIDTH 128
 #define SCREEN_HEIGHT 64
@@ -829,7 +830,9 @@ const unsigned char moutaz_bmp[] PROGMEM = {
 //______________________________________________
 
 
-//#define SPEAKER_DAC_PIN 25
+#define LED_PIN 25      // GPIO pin for LED strip
+#define LED_COUNT 8      // Number of LEDs in strip
+CRGB leds[LED_COUNT];
 
 // I2S Microphone config (INMP441)
 #define I2S_WS   15  // LRCL
@@ -852,6 +855,9 @@ void setup() {
   Serial.begin(115200);
   Serial.println("Emotion Bot with INMP441 Starting...");
 
+	FastLED.addLeds<NEOPIXEL, LED_PIN>(leds, LED_COUNT);
+	FastLED.clear(); FastLED.show();
+
   if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
     Serial.println("OLED not found!");
     while (1);
@@ -859,7 +865,12 @@ void setup() {
 	display.invertDisplay(true);
   display.setRotation(0);
   display.clearDisplay();
+
+	setMoodLEDs(currentMood, dBControll); 
   showMood(currentMood, dBControll);
+	
+
+
 
   setupI2SMic();
 }
@@ -887,6 +898,7 @@ void loop() {
 	dBControll = (double)dB;
 
   Mood newMood = currentMood;
+	
 
   // Thresholds based on dB 
 // Mood thresholds mapped to dB level
@@ -925,7 +937,10 @@ if (newMood != currentMood && millis() - lastChange > 2000) {
 
   Serial.print("Mood changed to: ");
   Serial.println(getMoodName(currentMood));
+	
+	setMoodLEDs(currentMood, dBControll); 
 	showMood(currentMood, dBControll);
+
   //smoothMoodTransition(currentMood, dBControll);
 }
 
@@ -979,6 +994,66 @@ void smoothMoodTransition(Mood newMood, float dB) {
   showMood(newMood, dB);
 }
 */
+/*
+void setMoodLEDs(Mood mood) {
+  CRGB color;
+
+  switch (mood) {
+    case SLEEPY:        color = CRGB::DarkBlue; break;
+    case DISAPPOINTED:  color = CRGB::Blue; break;
+    case CONFOUNDED:    color = CRGB::Purple; break;
+    case CONFUSED:      color = CRGB::MediumPurple; break;
+    case GRINNING:      color = CRGB::LightGreen; break;
+    case HUGGING:       color = CRGB::Orange; break;
+    case KISSING:       color = CRGB::Pink; break;
+    case HAPPY:         color = CRGB::GreenYellow; break;
+    case COLD:          color = CRGB::Aqua; break;
+    case ANGRY:         color = CRGB::Red; break;
+    case SHOUTING:      color = CRGB::OrangeRed; break;
+    case TEARY:         color = CRGB::Cyan; break;
+    case VOMITING:      color = CRGB::Green; break;
+    case Moutaz:        color = CRGB::White; break;
+    default:            color = CRGB::Black; break;
+  }
+
+  for (int i = 0; i < LED_COUNT; i++) {
+    leds[i] = color;
+  }
+
+  FastLED.show();
+}
+*/
+
+void setMoodLEDs(Mood mood, float dB) {
+  CRGB color;
+
+  if (mood == Moutaz) {
+    // Fade from white to red between 20 and 80 dB
+    float clampedDB = constrain(dB, 20.0, 80.0);  // Max 80
+    float fade = (clampedDB - 20.0) / 60.0;        // 0.0 to 1.0
+    color = blend(CRGB::White, CRGB::Red, fade * 255);
+  } else {
+    // Mood-based fade from white to red through yellow and orange
+    float clampedDB = constrain(dB, 20.0, 80.0);   // Max 80
+    float norm = (clampedDB - 20.0) / 60.0;        // 0.0 to 1.0
+
+    if (norm < 0.33) {
+      color = blend(CRGB::White, CRGB::Yellow, norm / 0.33 * 255);
+    } else if (norm < 0.66) {
+      color = blend(CRGB::Yellow, CRGB::Orange, (norm - 0.33) / 0.33 * 255);
+    } else {
+      color = blend(CRGB::Orange, CRGB::Red, (norm - 0.66) / 0.34 * 255);
+    }
+  }
+
+  // Set all LEDs
+  for (int i = 0; i < LED_COUNT; i++) {
+    leds[i] = color;
+  }
+
+  FastLED.show();
+}
+
 // Mood display
 void showMood(Mood mood, float dB) {
   display.clearDisplay();
