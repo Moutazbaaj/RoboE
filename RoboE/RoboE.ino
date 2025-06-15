@@ -1011,7 +1011,7 @@ void showMood(Mood mood, float dB) {
 		  // Draw dB value at bottom-right corner
  		 display.setTextSize(0);
   	 display.setTextColor(BLACK);
-  	 display.setCursor(70, 56);  // Adjust position as needed
+  	 display.setCursor(80, 56);  
   	 display.print("dB: ");
   	 display.print(dB, 1); // 1 decimal precision
   	 display.display();
