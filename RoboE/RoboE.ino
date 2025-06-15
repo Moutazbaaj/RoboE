@@ -9,6 +9,8 @@
 #define OLED_RESET    -1
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
+
+//______________________________________________
 //bitmap art
 const unsigned char happy_bmp[] PROGMEM = {
 	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 
@@ -209,6 +211,10 @@ const uint8_t sleepy_bmp[] PROGMEM = {
 	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
 };
 
+
+//______________________________________________
+
+
 //#define SPEAKER_DAC_PIN 25
 
 // I2S Microphone config (INMP441)
@@ -219,7 +225,22 @@ const uint8_t sleepy_bmp[] PROGMEM = {
 #define SAMPLE_BUFFER_SIZE 1024
 
 // States
-enum Mood { HAPPY, ANGRY, SLEEPY };
+enum Mood {
+  HAPPY,
+  ANGRY,
+  SLEEPY,
+  VOMITING,
+  CONFUSED,
+  GRINNING,
+  HUGGING,
+  SHOUTING,
+  TEARY,
+  KISSING,
+  COLD,
+  DISAPPOINTED,
+  CONFOUNDED
+};
+
 Mood currentMood = HAPPY;
 unsigned long lastChange = 0;
 
