@@ -281,13 +281,33 @@ void loop() {
 
   Mood newMood = currentMood;
 
-  // Thresholds based on dB (you can tweak these)
-  if (dB > 70.0) {
-    newMood = ANGRY;
-  } else if (dB < 30.0) {
+  // Thresholds based on dB 
+  if (dB < 15.0) {
     newMood = SLEEPY;
-  } else {
+  } else if (dB < 25.0) {
+    newMood = DISAPPOINTED;
+  } else if (dB < 35.0) {
+    newMood = CONFOUNDED;
+  } else if (dB < 45.0) {
+    newMood = CONFUSED;
+  } else if (dB < 55.0) {
+    newMood = GRINNING;
+  } else if (dB < 60.0) {
+    newMood = HUGGING;
+  } else if (dB < 65.0) {
+    newMood = KISSING;
+  } else if (dB < 70.0) {
+    newMood = COLD;
+  } else if (dB < 75.0) {
     newMood = HAPPY;
+  } else if (dB < 80.0) {
+    newMood = SHOUTING;
+  } else if (dB < 85.0) {
+    newMood = ANGRY;
+  } else if (dB < 90.0) {
+    newMood = TEARY;
+  } else {
+    newMood = VOMITING;
   }
 
   // Change mood only if different and 2s has passed
