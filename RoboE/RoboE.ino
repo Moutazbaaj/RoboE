@@ -1028,25 +1028,26 @@ void setMoodLEDs(Mood mood, float dB) {
   CRGB color;
 
   if (mood == Moutaz) {
-    // Fade from white to red between 20 and 80 dB
-    float clampedDB = constrain(dB, 20.0, 80.0);  // Max 80
-    float fade = (clampedDB - 20.0) / 60.0;        // 0.0 to 1.0
+    // Special: fade from white to red only
+    float clampedDB = constrain(dB, 20.0, 80.0);
+    float fade = (clampedDB - 20.0) / 60.0;
     color = blend(CRGB::White, CRGB::Red, fade * 255);
   } else {
-    // Mood-based fade from white to red through yellow and orange
-    float clampedDB = constrain(dB, 20.0, 80.0);   // Max 80
-    float norm = (clampedDB - 20.0) / 60.0;        // 0.0 to 1.0
+    // General: white → green → red
+    float clampedDB = constrain(dB, 20.0, 80.0);
+    float norm = (clampedDB - 20.0) / 60.0;  // 0.0 to 1.0
 
-    if (norm < 0.33) {
-      color = blend(CRGB::White, CRGB::Yellow, norm / 0.33 * 255);
-    } else if (norm < 0.66) {
-      color = blend(CRGB::Yellow, CRGB::Orange, (norm - 0.33) / 0.33 * 255);
+    if (norm < 0.5) {
+      // From White to Green (0.0 → 0.5)
+      float t = norm / 0.5;
+      color = blend(CRGB::White, CRGB::Green, t * 255);
     } else {
-      color = blend(CRGB::Orange, CRGB::Red, (norm - 0.66) / 0.34 * 255);
+      // From Green to Red (0.5 → 1.0)
+      float t = (norm - 0.5) / 0.5;
+      color = blend(CRGB::Green, CRGB::Red, t * 255);
     }
   }
 
-  // Set all LEDs
   for (int i = 0; i < LED_COUNT; i++) {
     leds[i] = color;
   }
