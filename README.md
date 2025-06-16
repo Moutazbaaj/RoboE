@@ -1,4 +1,4 @@
- """# 🤖 Emotion Bot – ESP32 Sound Reactive OLED + LED + DAC Project
+ """# 🤖 Emotion Bot – ESP32 Sound Reactive OLED + LED Project
 
 The **Emotion Bot** is a fun and expressive ESP32-powered robot that reacts to ambient sound using:
 - 🎤 An **INMP441 I2S microphone** to measure sound level (dB)
