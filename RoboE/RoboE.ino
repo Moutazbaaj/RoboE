@@ -930,7 +930,11 @@ if (dB < 20.0) {
   newMood = VOMITING;         // Noise-induced meltdown 
 }
 
+
 	showDB(dBControll);
+	setMoodLEDs(currentMood, dBControll); 
+
+
   // Change mood only if different and 2s has passed
 if (newMood != currentMood && millis() - lastChange > 2000) {
   lastChange = millis();
@@ -939,7 +943,6 @@ if (newMood != currentMood && millis() - lastChange > 2000) {
   Serial.print("Mood changed to: ");
   Serial.println(getMoodName(currentMood));
 	
-	setMoodLEDs(currentMood, dBControll); 
 	showMood(currentMood, dBControll);
 
   //smoothMoodTransition(currentMood, dBControll);
