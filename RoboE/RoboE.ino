@@ -930,7 +930,8 @@ if (dB < 20.0) {
   newMood = VOMITING;         // Noise-induced meltdown 
 }
 
-  // Change mood only if different and 5s has passed
+	showDB(dBControll);
+  // Change mood only if different and 2s has passed
 if (newMood != currentMood && millis() - lastChange > 2000) {
   lastChange = millis();
   currentMood = newMood;
@@ -944,7 +945,7 @@ if (newMood != currentMood && millis() - lastChange > 2000) {
   //smoothMoodTransition(currentMood, dBControll);
 }
 
-  delay(10);
+  delay(150);
 }
 
 // I2S Setup for INMP441
@@ -1083,14 +1084,17 @@ void showMood(Mood mood, float dB) {
       break;
   }
 
-		display.fillRect(0, 55, 128, 14, WHITE);
-		  // Draw dB value at bottom-right corner
- 		 display.setTextSize(0);
-  	 display.setTextColor(BLACK);
-  	 display.setCursor(80, 56);  
-  	 display.print("dB: ");
-  	 display.print(dB, 1); // 1 decimal precision
-  	 display.display();
+}
+
+void showDB(float dB) {
+  // Just update the bottom dB part (no emoji change)
+  display.fillRect(0, 55, 128, 14, WHITE); // Clear bottom area only
+  display.setTextSize(0);
+  display.setTextColor(BLACK);
+  display.setCursor(80, 56);
+  display.print("dB: ");
+  display.print(dB, 1);
+  display.display();
 }
 
 const char* getMoodName(Mood mood) {
