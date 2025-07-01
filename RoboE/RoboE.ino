@@ -851,6 +851,21 @@ unsigned long lastChange = 0;
 
 double dBControll = 0.0;
 
+
+// BPM detection
+#define BEAT_HISTORY 8    
+#define MIN_BEAT_INTERVAL 100       // minimum ms between beats to avoid false triggers
+#define BPM_WINDOW_MS     1500     // how often to recalculate BPM (10 seconds)
+#define MAX_BEAT_INTERVAL 2000  
+
+
+unsigned long lastBeatTime = 0;
+float beatIntervals[BEAT_HISTORY] = {0};  // Store last few beat intervals
+int beatIndex = 0;
+bool beatDetected = false;
+float bpm = 0;
+
+
 void setup() {
   Serial.begin(115200);
   Serial.println("Emotion Bot with INMP441 Starting...");
@@ -932,6 +947,7 @@ if (dB < 20.0) {
 
 
 	showDB(dBControll);
+	detectBeat(dBControll);
 	setMoodLEDs(currentMood, dBControll); 
 
 
@@ -1097,6 +1113,10 @@ void showDB(float dB) {
   display.setCursor(80, 56);
   display.print("dB: ");
   display.print(dB, 1);
+
+  display.setCursor(0, 56);
+  display.print("BPM: ");
+  display.print(bpm, 0);
   display.display();
 }
 
@@ -1119,3 +1139,32 @@ const char* getMoodName(Mood mood) {
   }
 }
 
+void detectBeat(float dB) {
+  static float lastDb = 0;
+  unsigned long now = millis();
+
+  float delta = dB - lastDb;
+  lastDb = dB;
+
+  // Detect beat on sharp spike or loud pulse
+  if ((delta > 6.0 || dB > 70.0) && (now - lastBeatTime > MIN_BEAT_INTERVAL)) {
+    unsigned long interval = now - lastBeatTime;
+
+    if (interval >= MIN_BEAT_INTERVAL && interval <= MAX_BEAT_INTERVAL) {
+      beatIntervals[beatIndex % BEAT_HISTORY] = interval;
+      beatIndex++;
+
+      // Compute average interval
+      int count = min(beatIndex, BEAT_HISTORY);
+      float sum = 0;
+      for (int i = 0; i < count; i++) sum += beatIntervals[i];
+
+      float avgInterval = sum / count;
+      bpm = 60000.0 / avgInterval;
+
+      Serial.printf("💥 Beat! Interval: %lu ms | BPM: %.1f\n", interval, bpm);
+    }
+
+    lastBeatTime = now;
+  }
+}
