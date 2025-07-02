@@ -966,6 +966,9 @@ if (newMood != currentMood && millis() - lastChange > 2000) {
 	
 	showMood(currentMood, dBControll);
 
+
+
+
   //smoothMoodTransition(currentMood, dBControll);
 }
 
@@ -1109,19 +1112,29 @@ void showMood(Mood mood, float dB) {
   }
 
 }
-
 void showDB(float dB) {
-  // Just update the bottom dB part (no emoji change)
-  display.fillRect(0, 55, 128, 14, WHITE); // Clear bottom area only
+  // Clear only the bottom display area
+  display.fillRect(0, 55, 128, 14, WHITE); 
   display.setTextSize(0);
   display.setTextColor(BLACK);
+
+  // Display dB value
   display.setCursor(80, 56);
   display.print("dB: ");
   display.print(dB, 1);
 
+  // Display BPM value
   display.setCursor(0, 56);
   display.print("BPM: ");
-  display.print(bpm, 0);
+  
+  if (bpm >= 1.0) {
+    display.print((int)bpm);  // Show integer BPM
+  } else if (bpm >= 0.0) {
+    display.print("0");       // Show 0 if BPM is small but non-negative
+  } else {
+    display.print("--");      // Show -- if BPM is negative or invalid
+  }
+
   display.display();
 }
 
@@ -1154,26 +1167,26 @@ void detectBeat(float dB) {
 
 
   if ((dB > runningAvg * DYNAMIC_FACTOR || delta > 6.0) && (now - lastBeatTime > MIN_BEAT_INTERVAL)) {
-  // Detect beat on sharp spike or loud pulse
-  if ((delta > 6.0 || dB > 70.0) && (now - lastBeatTime > MIN_BEAT_INTERVAL)) {
-    unsigned long interval = now - lastBeatTime;
+  	// Detect beat on sharp spike or loud pulse
+  	if ((delta > 6.0 || dB > 60.0) && (now - lastBeatTime > MIN_BEAT_INTERVAL)) {
+   	 unsigned long interval = now - lastBeatTime;
 
-    if (interval >= MIN_BEAT_INTERVAL && interval <= MAX_BEAT_INTERVAL) {
-      beatIntervals[beatIndex % BEAT_HISTORY] = interval;
-      beatIndex++;
+   	 if (interval >= MIN_BEAT_INTERVAL && interval <= MAX_BEAT_INTERVAL) {
+     	 beatIntervals[beatIndex % BEAT_HISTORY] = interval;
+     	 beatIndex++;
 
-      // Compute average interval
-      int count = min(beatIndex, BEAT_HISTORY);
-      float sum = 0;
-      for (int i = 0; i < count; i++) sum += beatIntervals[i];
+     	 // Compute average interval
+     	 int count = min(beatIndex, BEAT_HISTORY);
+      	float sum = 0;
+      	for (int i = 0; i < count; i++) sum += beatIntervals[i];
 
-      float avgInterval = sum / count;
-      bpm = 60000.0 / avgInterval;
+      	float avgInterval = sum / count;
+      	bpm = 60000.0 / avgInterval;
 
-      Serial.printf("💥 Beat! Interval: %lu ms | BPM: %.1f\n", interval, bpm);
-    }
+      	Serial.printf("Beat! Interval: %lu ms | BPM: %.1f\n", interval, bpm);
+    	}
 
-    lastBeatTime = now;
-  }
-}
+    	lastBeatTime = now;
+  	}
+	}
 }
