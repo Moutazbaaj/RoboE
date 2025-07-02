@@ -858,6 +858,11 @@ double dBControll = 0.0;
 #define BPM_WINDOW_MS     1500     // how often to recalculate BPM (10 seconds)
 #define MAX_BEAT_INTERVAL 2000  
 
+#define DYNAMIC_FACTOR 1.6
+
+float runningAvg = 60; // initialize
+float alpha = 0.05;    // smoothing factor
+
 
 unsigned long lastBeatTime = 0;
 float beatIntervals[BEAT_HISTORY] = {0};  // Store last few beat intervals
@@ -1143,9 +1148,12 @@ void detectBeat(float dB) {
   static float lastDb = 0;
   unsigned long now = millis();
 
+	runningAvg = (1 - alpha) * runningAvg + alpha * dB;
   float delta = dB - lastDb;
   lastDb = dB;
 
+
+  if ((dB > runningAvg * DYNAMIC_FACTOR || delta > 6.0) && (now - lastBeatTime > MIN_BEAT_INTERVAL)) {
   // Detect beat on sharp spike or loud pulse
   if ((delta > 6.0 || dB > 70.0) && (now - lastBeatTime > MIN_BEAT_INTERVAL)) {
     unsigned long interval = now - lastBeatTime;
@@ -1167,4 +1175,5 @@ void detectBeat(float dB) {
 
     lastBeatTime = now;
   }
+}
 }
