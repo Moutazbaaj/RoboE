@@ -74,3 +74,5 @@ Configure I2C and I2S pins properly. Example for INMP441:
 ```
 
 ---
+
+...
