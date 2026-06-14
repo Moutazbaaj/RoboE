@@ -7,7 +7,7 @@ The **Emotion Bot** is a fun and expressive ESP32-powered robot that reacts to a
 
 ---
 
-## 🎯 Features
+## 🎯 Features 
 
 | Feature            | Description |
 |--------------------|-------------|
@@ -33,7 +33,7 @@ The **Emotion Bot** is a fun and expressive ESP32-powered robot that reacts to a
 
 ---
 
-##  Components Used
+##  Components Used 
 
 - [x] ESP32 Mini D1 (or compatible)
 - [x] INMP441 I2S Microphone
